@@ -20,15 +20,15 @@ CORS(app)
 # db_drop_and_create_all()
 
 # ROUTES
-'''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
 
+@app.route('/drinks')
+def get_drinks():
+    drinks = Drink.query.order_by(Drink.id).all()
+
+    return jsonify({
+        'success': True,
+        'drinks': [drink.short() for drink in drinks]
+    })
 
 '''
 @TODO implement endpoint
@@ -103,8 +103,13 @@ def unprocessable(error):
 '''
 
 '''
-@TODO implement error handler for 404
-    error handler should conform to general task above
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
 '''
 
 
