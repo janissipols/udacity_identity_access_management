@@ -33,7 +33,7 @@ def get_drinks():
 
 @app.route('/drinks-detail')
 # @requires_auth('get:drinks-detail')
-def get_drinks_detail(payload):
+def get_drinks_detail():
     drinks = Drink.query.order_by(Drink.id).all()
 
     return jsonify({
@@ -44,7 +44,7 @@ def get_drinks_detail(payload):
 
 @app.route('/drinks', methods=['POST'])
 #@requires_auth('post:drinks')
-def create_drink(payload):
+def create_drink():
     body = request.get_json()
     if body is None:
         abort(400)
