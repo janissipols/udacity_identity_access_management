@@ -32,8 +32,8 @@ def get_drinks():
 
 
 @app.route('/drinks-detail')
-# @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
     drinks = Drink.query.order_by(Drink.id).all()
 
     return jsonify({
@@ -43,8 +43,8 @@ def get_drinks_detail():
 
 
 @app.route('/drinks', methods=['POST'])
-#@requires_auth('post:drinks')
-def create_drink():
+@requires_auth('post:drinks')
+def create_drink(payload):
     body = request.get_json()
     if body is None:
         abort(400)
@@ -65,7 +65,7 @@ def create_drink():
 
 
 @app.route('/drinks/<int:id>', methods=['PATCH'])
-#@requires_auth('patch:drinks')
+@requires_auth('patch:drinks')
 def update_drink(payload, id):
     body = request.get_json()
     if body is None:
