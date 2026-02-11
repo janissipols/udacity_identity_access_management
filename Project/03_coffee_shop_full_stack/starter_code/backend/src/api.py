@@ -11,13 +11,12 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-
 db_drop_and_create_all()
 
-# ROUTES
-
+# GET /drinks
+# Retrieves a list of drinks in short format.
 @app.route('/drinks')
-def get_drinks():
+def get_drinks(): # Retrieves a list of drinks in short format.
     drinks = Drink.query.order_by(Drink.id).all()
 
     return jsonify({
@@ -26,9 +25,11 @@ def get_drinks():
     })
 
 
+# GET /drinks-detail
+# Retrieves a list of drinks in detailed format, requires 'get:drinks-detail' permission.
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
-def get_drinks_detail(payload):
+def get_drinks_detail(payload): # Retrieves a list of drinks in detailed format, requires 'get:drinks-detail' permission.
     drinks = Drink.query.order_by(Drink.id).all()
 
     return jsonify({
@@ -37,9 +38,11 @@ def get_drinks_detail(payload):
     })
 
 
+# POST /drinks
+# Creates a new drink, requires 'post:drinks' permission.
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink(payload):
+def create_drink(payload): # Creates a new drink, requires 'post:drinks' permission.
     body = request.get_json()
     if body is None:
         abort(400)
@@ -59,9 +62,11 @@ def create_drink(payload):
     })
 
 
+# PATCH /drinks/<id>
+# Updates an existing drink, requires 'patch:drinks' permission.
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def update_drink(payload, id):
+def update_drink(payload, id): # Updates an existing drink, requires 'patch:drinks' permission.
     body = request.get_json()
     if body is None:
         abort(400)
@@ -88,9 +93,11 @@ def update_drink(payload, id):
     })
 
 
+# DELETE /drinks/<id>
+# Deletes a drink, requires 'delete:drinks' permission.
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(payload, id):
+def delete_drink(payload, id): # Deletes a drink, requires 'delete:drinks' permission.
     drink = Drink.query.filter(Drink.id == id).one_or_none()
 
     if drink is None:
@@ -107,16 +114,8 @@ def delete_drink(payload, id):
     })
 
 
-
-
-# Error Handling
-'''
-Example error handling for unprocessable entity
-'''
-
-
 @app.errorhandler(422)
-def unprocessable(error):
+def unprocessable(error): # Handles 422 unprocessable entity errors.
     return jsonify({
         "success": False,
         "error": 422,
@@ -124,35 +123,19 @@ def unprocessable(error):
     }), 422
 
 
-
 @app.errorhandler(404)
-
-def not_found(error):
-
+def not_found(error): # Handles 404 resource not found errors.
     return jsonify({
-
         "success": False,
-
         "error": 404,
-
         "message": "resource not found"
-
     }), 404
 
 
-
-
-
 @app.errorhandler(AuthError)
-
-def auth_error(ex):
-
+def auth_error(ex): # Handles authentication errors.
     return jsonify({
-
         "success": False,
-
         "error": ex.status_code,
-
         "message": ex.error['description']
-
     }), ex.status_code
