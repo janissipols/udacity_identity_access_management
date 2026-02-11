@@ -9,19 +9,12 @@ AUTH0_DOMAIN = 'dev-isajo81nbmm8nfy8.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'dev'
 
-## AuthError Exception
-
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
 
-
-## Auth Header
-
-def get_token_auth_header():
-    """Obtains the Access Token from the Authorization Header
-    """
+def get_token_auth_header(): # Extracts the JWT from the Authorization header.
     auth = request.headers.get('Authorization', None)
     if not auth:
         raise AuthError({
@@ -53,7 +46,7 @@ def get_token_auth_header():
     print("get_token_auth_header: Token successfully extracted.")
     return token
 
-def check_permissions(permission, payload):
+def check_permissions(permission, payload): # Checks if the decoded JWT has the required permission.
     if 'permissions' not in payload:
         raise AuthError({
             'code': 'invalid_claims',
@@ -67,7 +60,7 @@ def check_permissions(permission, payload):
         }, 403)
     return True
 
-def verify_decode_jwt(token):
+def verify_decode_jwt(token): # Verifies and decodes the JWT token.
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
     unverified_header = jwt.get_unverified_header(token)
@@ -120,7 +113,7 @@ def verify_decode_jwt(token):
                 'description': 'Unable to find the appropriate key.'
     }, 400)
 
-def requires_auth(permission=''):
+def requires_auth(permission=''): # Decorator that requires authentication and permission.
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
