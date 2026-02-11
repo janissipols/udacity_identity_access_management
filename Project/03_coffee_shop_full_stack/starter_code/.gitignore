@@ -13,3 +13,5 @@ test.db
 ehthumbs.db
 Thumbs.db
 frontend/.angular
+backend/venv
+frontend/node_modules
