@@ -9,32 +9,18 @@ database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filenam
 
 db = SQLAlchemy()
 
-'''
-setup_db(app)
-    binds a flask application and a SQLAlchemy service
-'''
 
-
-def setup_db(app):
+def setup_db(app): # Binds a Flask application and a SQLAlchemy service.
     app.config["SQLALCHEMY_DATABASE_URI"] = database_path
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
 
 
-'''
-db_drop_and_create_all()
-    drops the database tables and starts fresh
-    can be used to initialize a clean database
-    !!NOTE you can change the database_filename variable to have multiple verisons of a database
-'''
-
-
-def db_drop_and_create_all():
+def db_drop_and_create_all(): # Drops existing database tables, creates new ones, and populates with sample data.
     db.drop_all()
     db.create_all()
 
-    # Add sample drinks
     drink1 = Drink(
         title='matcha shake',
         recipe='[{"name": "milk", "color": "grey", "parts": 1}, {"name": "matcha", "color": "green", "parts": 3}]'
@@ -53,29 +39,13 @@ def db_drop_and_create_all():
     drink1.insert()
     drink2.insert()
     drink3.insert()
-# ROUTES
-
-'''
-Drink
-a persistent drink entity, extends the base SQLAlchemy Model
-'''
-
 
 class Drink(db.Model):
-    # Autoincrementing, unique primary key
     id = Column(Integer().with_variant(Integer, "sqlite"), primary_key=True)
-    # String Title
     title = Column(String(80), unique=True)
-    # the ingredients blob - this stores a lazy json blob
-    # the required datatype is [{'color': string, 'name':string, 'parts':number}]
     recipe = Column(String(180), nullable=False)
 
-    '''
-    short()
-        short form representation of the Drink model
-    '''
-
-    def short(self):
+    def short(self): # Returns a short form representation of the drink model.
         print(json.loads(self.recipe))
         short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
         return {
@@ -84,57 +54,23 @@ class Drink(db.Model):
             'recipe': short_recipe
         }
 
-    '''
-    long()
-        long form representation of the Drink model
-    '''
-
-    def long(self):
+    def long(self): # Returns a long form representation of the drink model.
         return {
             'id': self.id,
             'title': self.title,
             'recipe': json.loads(self.recipe)
         }
 
-    '''
-    insert()
-        inserts a new model into a database
-        the model must have a unique name
-        the model must have a unique id or null id
-        EXAMPLE
-            drink = Drink(title=req_title, recipe=req_recipe)
-            drink.insert()
-    '''
-
-    def insert(self):
+    def insert(self): # Inserts a new drink model into the database.
         db.session.add(self)
         db.session.commit()
 
-    '''
-    delete()
-        deletes a new model into a database
-        the model must exist in the database
-        EXAMPLE
-            drink = Drink(title=req_title, recipe=req_recipe)
-            drink.delete()
-    '''
-
-    def delete(self):
+    def delete(self): # Deletes a drink model from the database.
         db.session.delete(self)
         db.session.commit()
 
-    '''
-    update()
-        updates a new model into a database
-        the model must exist in the database
-        EXAMPLE
-            drink = Drink.query.filter(Drink.id == id).one_or_none()
-            drink.title = 'Black Coffee'
-            drink.update()
-    '''
-
-    def update(self):
+    def update(self): # Updates an existing drink model in the database.
         db.session.commit()
 
-    def __repr__(self):
+    def __repr__(self): # Returns a string representation of the drink.
         return json.dumps(self.short())
