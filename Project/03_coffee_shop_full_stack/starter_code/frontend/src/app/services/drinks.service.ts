@@ -98,7 +98,7 @@ export class DrinksService {
         console.log(res);
       });
     } else {
-      this.http.get(this.url + '/drinks', this.getHeaders())
+      this.http.get(this.url + '/drinks')
       .subscribe((res: any) => {
         this.drinksToItems(res.drinks);
         console.log(res);
